@@ -1,36 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <h3>Mapa de Vuelos</h3>
-    <div id="map"></div>
-    <script>
-      function initMap() {
-        var uluru = {lat: -25.363, lng: 131.044};
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4,
-          center: uluru
-        });
-        var marker = new google.maps.Marker({
-          position: uluru,
-          map: map
-        });
-      }
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4&callback=initMap">
-    </script>
-  </body>
+<head>
+    {{"decoupled-map"|googlemap_js(37.4419, -122.1419, markers=[(37.4419, -122.1419)])}}
+    {{mymap.js}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main-style.css') }}">
+</head>
+<body>
+<div id="menu-box">
+    <div id="menu-title">
+        Search Fly
+    </div>
+    <div style="font-weight: 800;">Departure Date:</div>
+    <div><input type="date"></p></div>
+    <div style="font-weight: 800;">Origin:</div>
+    <div><input type="text" name="origin"></div>
+    <div style="font-weight: 800;">Target:</div>
+    <div><input type="text" name="target"></div>
+    <div><input type="submit" name="Search"></div>
+</div>
+{{googlemap("simple-map", 37.4419, -122.1419)}}
+</div>
+</body>
 </html>
