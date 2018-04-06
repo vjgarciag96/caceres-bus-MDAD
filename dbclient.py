@@ -1,21 +1,22 @@
 from arango import ArangoClient
 
-class client():
+
+class Client:
 
     def __init__(self):
+        lines = open('credentials.txt').read()
+        credentials = lines.split(',')
+        username = credentials[0]
+        password = credentials[1]
         self.client = ArangoClient(
             protocol='http',
             host='localhost',
             port=8529,
-            username='root',
-            password='',
+            username=username,
+            password=password,
             enable_logging=True
         )
 
-        self.graph = client.db('flights').create_graph('flights_graph')
-        self.students = self.graph.create_vertex_collection('airports')
-        self.fligths = self.graph.create_edge_definition(
-            name='flights',
-            from_collections=['airports'],
-            to_collections=['airports']
-        )
+    def get_flights(self):
+        result = self.client.db('_system').aql.execute('FOR s IN flights RETURN s')
+        print(result)
