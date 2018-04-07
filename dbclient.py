@@ -1,7 +1,8 @@
 from arango import ArangoClient
 
 
-class Client:
+class arangodb_client:
+
     def __init__(self):
         lines = open('credentials.txt').read()
         credentials = lines.split(',')
@@ -17,26 +18,37 @@ class Client:
         )
 
     def get_best_flight(self, origin, target, day, month):
-        result = self.client.db('_system').aql.execute(
-            '''FOR v, e, p IN 2 OUTBOUND 'airports/''' + origin + '''' flights FILTER v._id == 'airports/''' + target + ''''
-FILTER p.edges[*].Month ALL == ''' + month + '''
-FILTER p.edges[*].DayofMonth ALL == ''' + day + '''
-LET flightTime = DATE_DIFF(p.edges[0].DepTimeUTC, p.edges[1].ArrTimeUTC, 'i') SORT flightTime ASC
-LIMIT 5
+        query = '''FOR v, e, p IN 2 OUTBOUND '/%s' flights FILTER v._id == '%s'
+FILTER p.edges[*].Month ALL == %s
+FILTER p.edges[*].DayofMonth ALL == %s
+FILTER DATE_ADD(p.edges[0].ArrTimeUTC, 20, 'minutes') < p.edges[1].DepTimeUTC LET flightTime = DATE_DIFF(p.edges[0].DepTimeUTC, p.edges[1].ArrTimeUTC, 'i') SORT flightTime ASC
+LIMIT 1
 RETURN { flight: p, time: flightTime }'''
-        )
+        query = query % (origin, target, day, month)
+        result = self.client.db('_system').aql.execute(query)
         collection = list()
-        collection.append([student for student in result])
+        for student in result:
+            collection.append(student)
         return collection
 
     def get_all_airports(self):
-        result = self.client.db('_system').aql.execute(
-            '''FOR airport IN airports
-            RETURN {
-                name:airport.airport,
-                id:airport._key
-            }'''
-        )
+        query = '''FOR airport IN airports RETURN { name:airport.airport, id:airport._id}'''
+        result = self.client.db('_system').aql.execute(query)
         collection = list()
-        collection.append([student for student in result])
+        for student in result:
+            collection.append(student)
+        return collection
+
+    def get_coordinates_from_airport(self, id):
+        query = '''FOR airport IN airports
+FILTER airport._id == '%s'
+RETURN {
+    lat:airport.lat,
+    long:airport.long
+}'''
+        query = query % (id)
+        result = self.client.db('_system').aql.execute(query)
+        collection = list()
+        for student in result:
+            collection.append(student)
         return collection
