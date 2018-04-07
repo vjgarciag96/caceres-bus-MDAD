@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from flask_googlemaps import GoogleMaps, Map
 from dbclient import arangodb_client
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 GoogleMaps(app, key='AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4')
@@ -9,17 +10,7 @@ GoogleMaps(app, key='AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4')
 
 @app.route('/')
 def map():
-    mymap = Map(
-        identifier="view-side",
-        lat=37.4419,
-        lng=-122.1419,
-        markers=[(37.4419, -122.1419)]
-    )
-
-    client = arangodb_client()
-    airports = client.get_all_airports()
-    airports = sorted(airports, key=lambda student: student['name'])
-    return render_template('map.html', mymap=mymap, airports=airports)
+    return render_template('map.html', airports=get_all_airports())
 
 
 @app.route('/', methods=['POST'])
@@ -44,11 +35,35 @@ def map_search_post():
             # coordinates -> lista de lat, long para la línea, time -> tiempo del vuelo mételo donde sea
         for coordinate in coordinates:
             print(coordinate)
+
+        return render_template('map.html', data = json.dumps(coordinates), airports=get_all_airports())
+
     else:
         msg = 'No hay combinación posible para realizar el vuelo :('
 
     print(msg)
-    return "Todo bien, todo correcto"
+    return json.dumps(msg)
+
+
+def get_all_airports():
+    return sorted(arangodb_client().get_all_airports(), key=lambda student: student['name'])
+
+
+def create_map_from_flights_coordinates(coordinates):
+    markers = list()
+    for coordinate in coordinates:
+        marker = {'icon': 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                  'lat': str(coordinate['lat']),
+                  'lng': str(coordinate['long'])}
+        markers.append(marker)
+
+    mymap = Map(
+        identifier="sndmap",
+        lat=46.77411111,
+        lng=-100.7467222,
+        markers=markers)
+
+    return mymap
 
 
 app.run(host='0.0.0.0', port=8081, threaded=True)

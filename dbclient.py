@@ -25,6 +25,7 @@ FILTER DATE_ADD(p.edges[0].ArrTimeUTC, 20, 'minutes') < p.edges[1].DepTimeUTC LE
 LIMIT 1
 RETURN { flight: p, time: flightTime }'''
         query = query % (origin, target, day, month)
+        print(query)
         result = self.client.db('_system').aql.execute(query)
         collection = list()
         for student in result:

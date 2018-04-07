@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {{"decoupled-map"|googlemap_js(37.4419, -122.1419, markers=[(37.4419, -122.1419)])}}
-    {{mymap.js}}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main-style.css') }}">
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4&sensor=false&callback=initMap"></script>
 </head>
 <body>
 <div id="menu-box">
@@ -34,7 +34,56 @@
         <div><input id="search-button" type="submit" name="Search"></div>
     </form>
 </div>
-{{googlemap("simple-map", 37.4419, -122.1419)}}
-</div>
+<div id='map'></div>
+<script>
+    function initMap() {
+        function drawFlightPlan(map, flightPlan) {
+            //populate the list with the points for Polyline
+            flightPlanList = [];
+            function populateFlighPlanList(latLng) {
+                console.log("añadiendo punto de la ruta...")
+                console.log(latLng);
+                var latLngFormatted = {lat: latLng.lat, lng: latLng.long}
+                flightPlanList.push(latLngFormatted)
+            }
+            flightPlan.forEach(populateFlighPlanList)
+
+            //draw Polyline
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanList,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+            flightPath.setMap(map);
+
+            //draw markers at origin and target points
+            var originPoint = new google.maps.Marker({
+                position: flightPlanList[0],
+                title: 'Origin'
+            });
+            var targetPoint = new google.maps.Marker({
+                position: flightPlanList[flightPlanList.length-1],
+                title: 'Target'
+            });
+            originPoint.setMap(map);
+            targetPoint.setMap(map);
+
+            //center map to center of flight path
+            var center = flightPlanList[parseInt(flightPlanList.length/2)]
+            map.setCenter(center)
+            map.setZoom(5)
+        }
+        var paloalto = {lat: 37.4419, lng: -122.1419};
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: paloalto
+        });
+        flightPlan = {{data | safe}}
+        if (flightPlan != null)
+            drawFlightPlan(map, flightPlan)
+    }
+</script>
 </body>
 </html>
