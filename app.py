@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from flask_googlemaps import GoogleMaps, Map
+from dbclient import arangodb_client
 from datetime import datetime
 
 app = Flask(__name__)
@@ -15,7 +16,8 @@ def map():
         markers=[(37.4419, -122.1419)]
     )
 
-    airports = [{'name': 'Malta', 'id': 'M75'}, {'name': 'Bismarck Municipal', 'id': 'BIS'}];
+    client = arangodb_client()
+    airports = client.get_all_airports()
     return render_template('map.html', mymap=mymap, airports=airports)
 
 
@@ -27,11 +29,9 @@ def map_search_post():
 
     # parse date into day and month
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
-    print("origen = " + str(origin))
-    print("destino = " + str(target))
-    print("date = " + str(date))
-    print("month = " + str(datetime_object.month))
-    print("day = " + str(datetime_object.day))
 
+    client = arangodb_client()
+    flightroute = client.get_best_flight(origin,target,datetime_object.day,datetime_object.month)
+    return flightroute
 
 app.run(host='0.0.0.0', port=8081, threaded=True)
