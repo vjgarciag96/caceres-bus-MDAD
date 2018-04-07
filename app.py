@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from flask_googlemaps import GoogleMaps, Map
+from datetime import datetime
 
 app = Flask(__name__)
 GoogleMaps(app, key='AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4')
@@ -23,9 +24,14 @@ def map_search_post():
     date = request.form['date']
     origin = request.form['origin']
     target = request.form['target']
+
+    # parse date into day and month
+    datetime_object = datetime.strptime(date, '%Y-%m-%d')
     print("origen = " + str(origin))
     print("destino = " + str(target))
     print("date = " + str(date))
+    print("month = " + str(datetime_object.month))
+    print("day = " + str(datetime_object.day))
 
 
 app.run(host='0.0.0.0', port=8081, threaded=True)
