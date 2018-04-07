@@ -18,7 +18,7 @@ class arangodb_client:
         )
 
     def get_best_flight(self, origin, target, day, month):
-        query = '''FOR v, e, p IN 2 OUTBOUND '/%s' flights FILTER v._id == '%s'
+        query = '''FOR v, e, p IN 2 OUTBOUND '%s' flights FILTER v._id == '%s'
 FILTER p.edges[*].Month ALL == %s
 FILTER p.edges[*].DayofMonth ALL == %s
 FILTER DATE_ADD(p.edges[0].ArrTimeUTC, 20, 'minutes') < p.edges[1].DepTimeUTC LET flightTime = DATE_DIFF(p.edges[0].DepTimeUTC, p.edges[1].ArrTimeUTC, 'i') SORT flightTime ASC
@@ -39,16 +39,3 @@ RETURN { flight: p, time: flightTime }'''
             collection.append(student)
         return collection
 
-    def get_coordinates_from_airport(self, id):
-        query = '''FOR airport IN airports
-FILTER airport._id == '%s'
-RETURN {
-    lat:airport.lat,
-    long:airport.long
-}'''
-        query = query % (id)
-        result = self.client.db('_system').aql.execute(query)
-        collection = list()
-        for student in result:
-            collection.append(student)
-        return collection
