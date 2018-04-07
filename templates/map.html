@@ -10,13 +10,29 @@
     <div id="menu-title">
         Search Fly
     </div>
-    <div style="font-weight: 800;">Departure Date:</div>
-    <div><input type="date"></p></div>
-    <div style="font-weight: 800;">Origin:</div>
-    <div><input type="text" name="origin"></div>
-    <div style="font-weight: 800;">Target:</div>
-    <div><input type="text" name="target"></div>
-    <div><input type="submit" name="Search"></div>
+    <form method="POST">
+        <div style="font-weight: 800;">Departure Date:</div>
+        <div><input type="date" name="date"></p></div>
+        <div style="font-weight: 800;">Origin:</div>
+        <div>
+            <select name="origin">
+                {% for airport in airports %}
+                <option value="{{airport.id}}">{{airport.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="font-weight: 800;">Target:</div>
+        <div>
+            <div>
+                <select name="target">
+                    {% for airport in airports %}
+                    <option value="{{airport.id}}">{{airport.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div><input type="submit" name="Search"></div>
+    </form>
 </div>
 {{googlemap("simple-map", 37.4419, -122.1419)}}
 </div>
