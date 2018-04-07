@@ -32,19 +32,23 @@ def map_search_post():
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
 
     client = arangodb_client()
-    flightroute = client.get_best_flight(origin,target,datetime_object.day,datetime_object.month)
+    flightroute = client.get_best_flight(origin, target, datetime_object.day, datetime_object.month)
 
     if flightroute:
         flightroute = flightroute[0]
         time = flightroute['time']
-        msg = 'Tiempo estimado de viaje: '+str(time)+'m'
+        msg = 'Tiempo estimado de viaje: ' + str(time) + 'm'
         coordinates = list()
         for flight in flightroute['flight']['vertices']:
             coordinates.append({'lat': flight['lat'], 'long': flight['long']})
-        #coordinates -> lista de lat, long para la línea, time -> tiempo del vuelo mételo donde sea
+            # coordinates -> lista de lat, long para la línea, time -> tiempo del vuelo mételo donde sea
+        for coordinate in coordinates:
+            print(coordinate)
     else:
         msg = 'No hay combinación posible para realizar el vuelo :('
 
-    return flightroute
+    print(msg)
+    return "Todo bien, todo correcto"
+
 
 app.run(host='0.0.0.0', port=8081, threaded=True)
