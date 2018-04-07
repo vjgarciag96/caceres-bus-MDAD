@@ -18,6 +18,7 @@ def map():
 
     client = arangodb_client()
     airports = client.get_all_airports()
+    airports = sorted(airports, key=lambda student: student['name'])
     return render_template('map.html', mymap=mymap, airports=airports)
 
 
@@ -32,6 +33,18 @@ def map_search_post():
 
     client = arangodb_client()
     flightroute = client.get_best_flight(origin,target,datetime_object.day,datetime_object.month)
+
+    if flightroute:
+        flightroute = flightroute[0]
+        time = flightroute['time']
+        msg = 'Tiempo estimado de viaje: '+str(time)+'m'
+        coordinates = list()
+        for flight in flightroute['flight']['vertices']:
+            coordinates.append({'lat': flight['lat'], 'long': flight['long']})
+        #coordinates -> lista de lat, long para la línea, time -> tiempo del vuelo mételo donde sea
+    else:
+        msg = 'No hay combinación posible para realizar el vuelo :('
+
     return flightroute
 
 app.run(host='0.0.0.0', port=8081, threaded=True)

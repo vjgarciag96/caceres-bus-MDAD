@@ -38,4 +38,3 @@ RETURN { flight: p, time: flightTime }'''
         for student in result:
             collection.append(student)
         return collection
-
