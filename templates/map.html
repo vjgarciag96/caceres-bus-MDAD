@@ -2,10 +2,12 @@
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main-style.css') }}">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4&callback=initMap"></script>
 </head>
 <body>
+<div id="flight-time-box" style='display:none'>{{flight_time}}</div>
 <div id="menu-box">
     <div id="menu-title">
         Search Fly
@@ -43,8 +45,10 @@
             center: paloalto
         });
         flightPlan = {{data | safe}}
-        if (flightPlan != null && flightPlan.length > 0)
-            drawFlightPlan(map, flightPlan)
+        if (flightPlan != null && flightPlan.length > 0) {
+            drawFlightPlan(map, flightPlan);
+            $('#flight-time-box').fadeIn(400).delay(3000);
+        }
     }
     function drawFlightPlan(map, flightPlan) {
         //populate the list with the points for Polyline
