@@ -24,7 +24,7 @@ def map_search_post():
     if flightroute:
         flightroute = flightroute[0]
         time = flightroute['time']
-        flight_time = 'Tiempo estimado de viaje: ' + str(time) + 'm'
+        flight_time = 'Tiempo estimado de viaje: ' + str(time) + ' min'
         coordinates = list()
         for flight in flightroute['flight']['vertices']:
             coordinates.append({'lat': flight['lat'], 'long': flight['long']})
@@ -36,8 +36,7 @@ def map_search_post():
     else:
         flight_time = 'No hay combinación posible para realizar el vuelo :('
 
-    return render_template('map.html', flight_time=flight_time,
-                           airports=get_all_airports())
+    return render_template('map.html',data=json.dumps([]), flight_time=flight_time, airports=get_all_airports())
 
 
 def get_all_airports():
