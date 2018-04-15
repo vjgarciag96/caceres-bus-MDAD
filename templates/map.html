@@ -44,10 +44,10 @@
             zoom: 15,
             center: paloalto
         });
+	$('#flight-time-box').fadeIn(400).delay(3000);
         flightPlan = {{data | safe}}
         if (flightPlan != null && flightPlan.length > 0) {
             drawFlightPlan(map, flightPlan);
-            $('#flight-time-box').fadeIn(400).delay(3000);
         }
     }
     function drawFlightPlan(map, flightPlan) {
