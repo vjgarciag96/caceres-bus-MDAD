@@ -32,10 +32,10 @@ RETURN { flight: p, time: flightTime }'''
             collection.append(student)
         return collection
 
-    def get_all_airports(self):
-        query = '''FOR airport IN airports RETURN { name:airport.airport, id:airport._id}'''
-        result = self.client.db('_system').aql.execute(query)
-        collection = list()
-        for student in result:
-            collection.append(student)
-        return collection
+    def get_all_stops(self):
+        query = '''FOR stop IN stops SORT stop.name RETURN {name:stop.name, id:stop._key} '''
+        query_result = self.client.db('_system').aql.execute(query)
+        stops = list()
+        for stop in query_result:
+            stops.append(stop)
+        return stops

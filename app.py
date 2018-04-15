@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def map():
-    return render_template('map.html', data=json.dumps([]), airports=get_all_airports())
+    return render_template('map.html', data=json.dumps([]), stops=get_all_stops())
 
 @app.route('/', methods=['POST'])
 def map_search_post():
@@ -39,7 +39,7 @@ def map_search_post():
     return render_template('map.html',data=json.dumps([]), flight_time=flight_time, airports=get_all_airports())
 
 
-def get_all_airports():
-    return sorted(arangodb_client().get_all_airports(), key=lambda student: student['name'])
+def get_all_stops():
+    return arangodb_client().get_all_stops()
 
 app.run(host='0.0.0.0', port=8081, threaded=True)

@@ -18,8 +18,8 @@
         <div style="font-weight: 800;">Origin:</div>
         <div>
             <select name="origin">
-                {% for airport in airports %}
-                <option value="{{airport.id}}">{{airport.name}}</option>
+                {% for stop in stops %}
+                <option value="{{stop.id}}">{{stop.name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -27,8 +27,8 @@
         <div>
             <div>
                 <select name="target">
-                    {% for airport in airports %}
-                    <option value="{{airport.id}}">{{airport.name}}</option>
+                    {% for stop in stops %}
+                    <option value="{{stop.id}}">{{stop.name}}</option>
                     {% endfor %}
                 </select>
             </div>
