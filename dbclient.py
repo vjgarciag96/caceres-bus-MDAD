@@ -2,7 +2,6 @@ from arango import ArangoClient
 
 
 class arangodb_client:
-
     def __init__(self):
         lines = open('credentials.txt').read()
         credentials = lines.split(',')
@@ -16,6 +15,14 @@ class arangodb_client:
             password=password,
             enable_logging=True
         )
+
+    def get_shortest_bus_path(self, origin, target, time):
+        shortest_bus_path_query = "FOR trip IN OUTBOUND SHORTEST_PATH '{}' TO '{}' trips RETURN trip".format('stops/{}'.format(origin), 'stops/{}'.format(target))
+        query_result = self.client.db('_system').aql.execute(shortest_bus_path_query)
+        bus_path_points = list()
+        for point in query_result:
+            bus_path_points.append(point)
+        return bus_path_points
 
     def get_best_flight(self, origin, target, day, month):
         query = '''FOR v, e, p IN 2 OUTBOUND '%s' flights FILTER v._id == '%s'

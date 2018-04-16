@@ -7,14 +7,14 @@
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4&callback=initMap"></script>
 </head>
 <body>
-<div id="flight-time-box" style='display:none'>{{flight_time}}</div>
+<div id="trip-time-box" style='display:none'>{{trip_time}}</div>
 <div id="menu-box">
     <div id="menu-title">
-        Search Fly
+        Search Bus Trip
     </div>
     <form method="POST">
         <div style="font-weight: 800;">Departure Date:</div>
-        <div><input type="date" name="date"></p></div>
+        <div><input type="time" name="time"></p></div>
         <div style="font-weight: 800;">Origin:</div>
         <div>
             <select name="origin">
@@ -44,50 +44,50 @@
             zoom: 15,
             center: paloalto
         });
-	$('#flight-time-box').fadeIn(400).delay(3000);
-        flightPlan = {{data | safe}}
-        if (flightPlan != null && flightPlan.length > 0) {
-            drawFlightPlan(map, flightPlan);
+	$('#trip-time-box').fadeIn(400).delay(3000);
+        tripPlan = {{data | safe}}
+        if (tripPlan != null && tripPlan.length > 0) {
+            drawTripPlan(map, tripPlan);
         }
     }
-    function drawFlightPlan(map, flightPlan) {
+    function drawTripPlan(map, tripPlan) {
         //populate the list with the points for Polyline
-        flightPlanList = [];
+        tripPlanList = [];
         function populateFlighPlanList(latLng) {
             console.log("añadiendo punto de la ruta...")
             console.log(latLng);
-            var latLngFormatted = {lat: latLng.lat, lng: latLng.long}
-            flightPlanList.push(latLngFormatted)
+            var latLngFormatted = {lat: latLng.lat, lng: latLng.lon}
+            tripPlanList.push(latLngFormatted)
         }
 
-        flightPlan.forEach(populateFlighPlanList)
+        tripPlan.forEach(populateFlighPlanList)
 
         //draw Polyline
-        var flightPath = new google.maps.Polyline({
-            path: flightPlanList,
+        var tripPath = new google.maps.Polyline({
+            path: tripPlanList,
             geodesic: true,
             strokeColor: '#FF0000',
             strokeOpacity: 1.0,
             strokeWeight: 2
         });
-        flightPath.setMap(map);
+        tripPath.setMap(map);
 
         //draw markers at origin and target points
         var originPoint = new google.maps.Marker({
-            position: flightPlanList[0],
+            position: tripPlanList[0],
             title: 'Origin'
         });
         var targetPoint = new google.maps.Marker({
-            position: flightPlanList[flightPlanList.length - 1],
+            position: tripPlanList[tripPlanList.length - 1],
             title: 'Target'
         });
         originPoint.setMap(map);
         targetPoint.setMap(map);
 
-        //center map to center of flight path
-        var center = flightPlanList[parseInt(flightPlanList.length / 2)]
+        //center map to center of trip path
+        var center = tripPlanList[parseInt(tripPlanList.length / 2)]
         map.setCenter(center)
-        map.setZoom(5)
+        map.setZoom(15)
     }
 </script>
 </body>

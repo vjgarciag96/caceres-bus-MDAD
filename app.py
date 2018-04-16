@@ -1,45 +1,70 @@
 from flask import Flask, render_template, request
+import requests
 from dbclient import arangodb_client
-from datetime import datetime
 import json
+from endpoints import GOOGLE_DIRECTION_ENDPOINT_WITH_PARAMS
+from keys import GOOGLE_DIRECTION_API_KEY
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def map():
     return render_template('map.html', data=json.dumps([]), stops=get_all_stops())
 
+
 @app.route('/', methods=['POST'])
 def map_search_post():
-    date = request.form['date']
+    time = request.form['time']
     origin = request.form['origin']
     target = request.form['target']
 
-    # parse date into day and month
-    datetime_object = datetime.strptime(date, '%Y-%m-%d')
+    print(str(time))
 
     client = arangodb_client()
-    flightroute = client.get_best_flight(origin, target, datetime_object.day, datetime_object.month)
+    bus_path = client.get_shortest_bus_path(origin, target, time)
 
-    if flightroute:
-        flightroute = flightroute[0]
-        time = flightroute['time']
-        flight_time = 'Tiempo estimado de viaje: ' + str(time) + ' min'
+    if bus_path:
+        print(bus_path)
+
+        # time = bus_route['time']
+        # trip_time = 'Tiempo estimado de viaje: ' + str(time) + ' min'
         coordinates = list()
-        for flight in flightroute['flight']['vertices']:
-            coordinates.append({'lat': flight['lat'], 'long': flight['long']})
-        for coordinate in coordinates:
-            print(coordinate)
 
-        return render_template('map.html', data = json.dumps(coordinates), flight_time=flight_time, airports=get_all_airports())
+        for index in range(len(bus_path) - 1):
+            if index + 1 <= len(bus_path) - 1:
+                coordinates = coordinates + get_real_bus_path_coordinates_between_locations(bus_path[index],
+                                                                                            bus_path[index + 1])
+
+        return render_template('map.html', data=json.dumps(coordinates), trip_time=0, stops=get_all_stops())
 
     else:
-        flight_time = 'No hay combinación posible para realizar el vuelo :('
+        trip_time = 'No hay combinación posible para realizar el vuelo :('
 
-    return render_template('map.html',data=json.dumps([]), flight_time=flight_time, airports=get_all_airports())
+    return render_template('map.html', data=json.dumps([]), trip_time=trip_time, airports=get_all_stops())
 
 
 def get_all_stops():
     return arangodb_client().get_all_stops()
+
+
+def get_real_bus_path_coordinates_between_locations(start_location, end_location):
+    path_coordinates = list()
+
+    latlng_str = '{},{}'
+    direction = requests.get(GOOGLE_DIRECTION_ENDPOINT_WITH_PARAMS.
+                             format(latlng_str.format(start_location['lat'], start_location['lon']),
+                                    latlng_str.format(end_location['lat'], end_location['lon']),
+                                    GOOGLE_DIRECTION_API_KEY))
+    directions_dict = direction.json()
+
+    path_coordinates.append({'lat': start_location['lat'], 'lon': start_location['lon']})
+
+    for step in directions_dict['routes'][0]['legs'][0]['steps']:
+        latlng = step['end_location']
+        path_coordinates.append({'lat': latlng['lat'], 'lon': latlng['lng']})
+
+    return path_coordinates
+
 
 app.run(host='0.0.0.0', port=8081, threaded=True)
