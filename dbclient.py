@@ -16,8 +16,8 @@ class arangodb_client:
             enable_logging=True
         )
 
-    def get_shortest_bus_path(self, origin, target, time):
-        shortest_bus_path_query = "FOR trip IN OUTBOUND SHORTEST_PATH '{}' TO '{}' trips RETURN trip".format('stops/{}'.format(origin), 'stops/{}'.format(target))
+    def get_shortest_bus_path(self, origin, target):
+        shortest_bus_path_query = "FOR stop, trip IN OUTBOUND SHORTEST_PATH '{}' TO '{}' trips RETURN {{'stop': stop, 'bus_line':trip.route_short_name}}".format('stops/{}'.format(origin), 'stops/{}'.format(target))
         query_result = self.client.db('_system').aql.execute(shortest_bus_path_query)
         bus_path_points = list()
         for point in query_result:
@@ -46,3 +46,8 @@ RETURN { flight: p, time: flightTime }'''
         for stop in query_result:
             stops.append(stop)
         return stops
+
+    def get_stop_by_id(self, id):
+        query = 'FOR stop IN stops FILTER stop._id == "{}" RETURN stop'
+        query_result = self.client.db('_system').aql.execute(query.format(str(id)))
+        return query_result

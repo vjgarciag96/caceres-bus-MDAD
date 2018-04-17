@@ -13,8 +13,6 @@
         Search Bus Trip
     </div>
     <form method="POST">
-        <div style="font-weight: 800;">Departure Date:</div>
-        <div><input type="time" name="time"></p></div>
         <div style="font-weight: 800;">Origin:</div>
         <div>
             <select name="origin">
@@ -38,41 +36,100 @@
 </div>
 <div id='map'></div>
 <script>
+    function getBusLineColor(busLine) {
+        var colores = {
+            'L1': '#0000FF',
+            'L2': '#FF0000',
+            'L3': '#008000',
+            'L4': '#B57024',
+            'L5': '#FF8000',
+            'L6': '#8000FF',
+            'L7': '#000000',
+            'L8': '#FFFF00',
+            'LC': '#808000',
+            'RC': '#00FF00',
+            'RM': '#00FFFF'
+        };
+        return colores[busLine];
+    }
+
     function initMap() {
         var paloalto = {lat: 37.4419, lng: -122.1419};
         var map = new google.maps.Map(document.getElementById('map'), {
             zoom: 15,
             center: paloalto
         });
-	$('#trip-time-box').fadeIn(400).delay(3000);
-        tripPlan = {{data | safe}}
+        $('#trip-time-box').fadeIn(400).delay(3000);
+        var tripPlan = {{data | safe}}
+        console.log(tripPlan)
         if (tripPlan != null && tripPlan.length > 0) {
             drawTripPlan(map, tripPlan);
         }
     }
     function drawTripPlan(map, tripPlan) {
         //populate the list with the points for Polyline
-        tripPlanList = [];
-        function populateFlighPlanList(latLng) {
-            console.log("añadiendo punto de la ruta...")
-            console.log(latLng);
-            var latLngFormatted = {lat: latLng.lat, lng: latLng.lon}
-            tripPlanList.push(latLngFormatted)
+        var tripPlanList = [];
+        var busLineList = [];
+
+        function populateFlighPlanList(busPath) {
+            console.log("añadiendo punto de la ruta...");
+            console.log(busPath);
+            var latLngFormatted = {lat: busPath.lat, lng: busPath.lon};
+            tripPlanList.push(latLngFormatted);
+            if (busPath.bus_line !== null && busPath.bus_line !== undefined)
+                busLineList.push(busPath.busLine)
         }
 
-        tripPlan.forEach(populateFlighPlanList)
+        function drawPolylinesForTrips(tripPlanList, busLineList) {
+            console.log(tripPlanList.length)
+            console.log(busLineList.length)
+            for (var i = 0; i < busLineList.length; i++) {
 
-        //draw Polyline
-        var tripPath = new google.maps.Polyline({
-            path: tripPlanList,
-            geodesic: true,
-            strokeColor: '#FF0000',
-            strokeOpacity: 1.0,
-            strokeWeight: 2
+                var path = [];
+                path.push({lat:tripPlanList[i].lat, lng:tripPlanList[i].lng});
+                path.push({lat:tripPlanList[i+1].lat, lng:tripPlanList[i+1].lng});
+
+                //draw Polyline
+                var tripPath = new google.maps.Polyline({
+                    path: path,
+                    geodesic: true,
+                    strokeColor: getBusLineColor(busLineList[i]),
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2
+                });
+                tripPath.setMap(map);
+            }
+        }
+
+        tripPlan.forEach(populateFlighPlanList);
+        drawPolylinesForTrips(tripPlanList, busLineList)
+        //InfoWindow for markers
+        var contentString = '<div id="content">' +
+                '<div id="siteNotice">' +
+                '</div>' +
+                '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
+                '<div id="bodyContent">' +
+                '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+                'sandstone rock formation in the southern part of the ' +
+                'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
+                'south west of the nearest large town, Alice Springs; 450&#160;km ' +
+                '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
+                'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
+                'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
+                'Aboriginal people of the area. It has many springs, waterholes, ' +
+                'rock caves and ancient paintings. Uluru is listed as a World ' +
+                'Heritage Site.</p>' +
+                '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+                'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
+                '(last visited June 22, 2009).</p>' +
+                '</div>' +
+                '</div>';
+
+        var infoWindow = new google.maps.InfoWindow({
+            content: contentString
         });
-        tripPath.setMap(map);
 
-        //draw markers at origin and target points
+        //draw markers at origin and end points
         var originPoint = new google.maps.Marker({
             position: tripPlanList[0],
             title: 'Origin'
@@ -81,7 +138,13 @@
             position: tripPlanList[tripPlanList.length - 1],
             title: 'Target'
         });
+        originPoint.addListener('click', function () {
+            infoWindow.open(map, originPoint)
+        });
         originPoint.setMap(map);
+        targetPoint.addListener('click', function () {
+            infoWindow.open(map, targetPoint)
+        });
         targetPoint.setMap(map);
 
         //center map to center of trip path
@@ -100,6 +163,7 @@
             });
             point.setMap(map)
         }
+
         tripPlanList.forEach(drawPathMarker)
     }
 </script>
