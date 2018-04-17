@@ -88,6 +88,19 @@
         var center = tripPlanList[parseInt(tripPlanList.length / 2)]
         map.setCenter(center)
         map.setZoom(15)
+
+        //draw marker for each intermediate stop
+        tripPlanList.splice(0, 1)
+        tripPlanList.splice(tripPlanList.length - 1, 1)
+        function drawPathMarker(tripPlanPoint) {
+            var point = new google.maps.Marker({
+                position: tripPlanPoint,
+                title: 'Intermediate Point',
+                icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|0000FF'
+            });
+            point.setMap(map)
+        }
+        tripPlanList.forEach(drawPathMarker)
     }
 </script>
 </body>
