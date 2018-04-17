@@ -7,7 +7,7 @@
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo6E0nwsf0ijiCQZJBsq8Rs7Ptt4Na6l4&callback=initMap"></script>
 </head>
 <body>
-<div id="trip-time-box" style='display:none'>{{trip_time}}</div>
+<div id="bus-line-toast" style='display:none'>{{bus_line}}</div>
 <div id="menu-box">
     <div id="menu-title">
         Search Bus Trip
@@ -50,6 +50,7 @@
             'RC': '#00FF00',
             'RM': '#00FFFF'
         };
+        console.log(colores[busLine])
         return colores[busLine];
     }
 
@@ -59,7 +60,6 @@
             zoom: 15,
             center: paloalto
         });
-        $('#trip-time-box').fadeIn(400).delay(3000);
         var tripPlan = {{data | safe}}
         console.log(tripPlan)
         if (tripPlan != null && tripPlan.length > 0) {
@@ -71,18 +71,19 @@
         var tripPlanList = [];
         var busLineList = [];
 
+        polylineBusLine = []
+
         function populateFlighPlanList(busPath) {
             console.log("añadiendo punto de la ruta...");
             console.log(busPath);
             var latLngFormatted = {lat: busPath.lat, lng: busPath.lon};
             tripPlanList.push(latLngFormatted);
             if (busPath.bus_line !== null && busPath.bus_line !== undefined)
-                busLineList.push(busPath.busLine)
+                busLineList.push(busPath.bus_line)
         }
 
         function drawPolylinesForTrips(tripPlanList, busLineList) {
-            console.log(tripPlanList.length)
-            console.log(busLineList.length)
+            console.log(busLineList);
             for (var i = 0; i < busLineList.length; i++) {
 
                 var path = [];
@@ -95,8 +96,22 @@
                     geodesic: true,
                     strokeColor: getBusLineColor(busLineList[i]),
                     strokeOpacity: 1.0,
-                    strokeWeight: 2
+                    strokeWeight: 15
                 });
+                polylineBusLine.push({polyline: tripPath, busLine: busLineList[i]})
+                google.maps.event.addListener(tripPath, 'click', function () {
+                    handlePolyClick(this);
+                });
+                function handlePolyClick(polyline){
+                    for(var i = 0; i< polylineBusLine.length; i++){
+                        console.log(polyline);
+                        console.log(polylineBusLine[i].polyline);
+                        if(polyline === polylineBusLine[i].polyline){
+                            $('#bus-line-toast').fadeIn(400).delay(3000).text(polylineBusLine[i].busLine);
+                            console.log(polylineBusLine[i].busLine);
+                        }
+                    }
+                }
                 tripPath.setMap(map);
             }
         }
