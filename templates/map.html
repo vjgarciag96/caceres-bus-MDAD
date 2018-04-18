@@ -118,30 +118,30 @@
 
         tripPlan.forEach(populateFlighPlanList);
         drawPolylinesForTrips(tripPlanList, busLineList)
-        //InfoWindow for markers
+
         var contentString = '<div id="content">' +
-                '<div id="siteNotice">' +
-                '</div>' +
-                '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
-                '<div id="bodyContent">' +
-                '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
-                'sandstone rock formation in the southern part of the ' +
-                'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
-                'south west of the nearest large town, Alice Springs; 450&#160;km ' +
-                '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
-                'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
-                'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
-                'Aboriginal people of the area. It has many springs, waterholes, ' +
-                'rock caves and ancient paintings. Uluru is listed as a World ' +
-                'Heritage Site.</p>' +
-                '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
-                'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
-                '(last visited June 22, 2009).</p>' +
-                '</div>' +
-                '</div>';
+                    '<div id="siteNotice">' +
+                    '</div>' +
+                    '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
+                    '<div id="bodyContent">' +
+                    '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+                    'sandstone rock formation in the southern part of the ' +
+                    'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
+                    'south west of the nearest large town, Alice Springs; 450&#160;km ' +
+                    '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
+                    'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
+                    'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
+                    'Aboriginal people of the area. It has many springs, waterholes, ' +
+                    'rock caves and ancient paintings. Uluru is listed as a World ' +
+                    'Heritage Site.</p>' +
+                    '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+                    'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
+                    '(last visited June 22, 2009).</p>' +
+                    '</div>' +
+                    '</div>';
 
         var infoWindow = new google.maps.InfoWindow({
-            content: contentString
+           content: contentString
         });
 
         //draw markers at origin and end points
@@ -153,30 +153,58 @@
             position: tripPlanList[tripPlanList.length - 1],
             title: 'Target'
         });
-        originPoint.addListener('click', function () {
-            infoWindow.open(map, originPoint)
-        });
+
         originPoint.setMap(map);
-        targetPoint.addListener('click', function () {
-            infoWindow.open(map, targetPoint)
+        originPoint.addListener('click', function () {
+            infoWindow.open(map, originPoint);
         });
         targetPoint.setMap(map);
+        targetPoint.addListener('click', function () {
+            infoWindow.open(map, targetPoint);
+        });
 
         //center map to center of trip path
-        var center = tripPlanList[parseInt(tripPlanList.length / 2)]
-        map.setCenter(center)
-        map.setZoom(15)
+        var center = tripPlanList[parseInt(tripPlanList.length / 2)];
+        map.setCenter(center);
+        map.setZoom(15);
 
         //draw marker for each intermediate stop
-        tripPlanList.splice(0, 1)
-        tripPlanList.splice(tripPlanList.length - 1, 1)
+        tripPlanList.splice(0, 1);
+        tripPlanList.splice(tripPlanList.length - 1, 1);
         function drawPathMarker(tripPlanPoint) {
+             var contentString = '<div id="content">' +
+                    '<div id="siteNotice">' +
+                    '</div>' +
+                    '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
+                    '<div id="bodyContent">' +
+                    '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+                    'sandstone rock formation in the southern part of the ' +
+                    'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) ' +
+                    'south west of the nearest large town, Alice Springs; 450&#160;km ' +
+                    '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major ' +
+                    'features of the Uluru - Kata Tjuta National Park. Uluru is ' +
+                    'sacred to the Pitjantjatjara and Yankunytjatjara, the ' +
+                    'Aboriginal people of the area. It has many springs, waterholes, ' +
+                    'rock caves and ancient paintings. Uluru is listed as a World ' +
+                    'Heritage Site.</p>' +
+                    '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+                    'https://en.wikipedia.org/w/index.php?title=Uluru</a> ' +
+                    '(last visited June 22, 2009).</p>' +
+                    '</div>' +
+                    '</div>';
+
+            var infoWindow = new google.maps.InfoWindow({
+               content: contentString
+            });
             var point = new google.maps.Marker({
                 position: tripPlanPoint,
                 title: 'Intermediate Point',
                 icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|0000FF'
             });
-            point.setMap(map)
+            point.setMap(map);
+            point.addListener('click', function () {
+                infoWindow.open(map, point);
+            });
         }
 
         tripPlanList.forEach(drawPathMarker)
