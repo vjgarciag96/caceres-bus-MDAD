@@ -17,7 +17,7 @@
         <div>
             <select name="origin">
                 {% for stop in stops %}
-                <option value="{{stop.id}}">{{stop.name}}</option>
+                <option value="{{stop.id}}" {% if origin_selected==stop.id %} selected="selected"{% endif %}>{{stop.name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -26,7 +26,7 @@
             <div>
                 <select name="target">
                     {% for stop in stops %}
-                    <option value="{{stop.id}}">{{stop.name}}</option>
+                    <option value="{{stop.id}}" {% if target_selected==stop.id %} selected="selected"{% endif %}>{{stop.name}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -71,7 +71,7 @@
         var tripPlanList = [];
         var busLineList = [];
 
-        polylineBusLine = []
+        polylineBusLine = [];
 
         function populateFlighPlanList(busPath) {
             console.log("añadiendo punto de la ruta...");

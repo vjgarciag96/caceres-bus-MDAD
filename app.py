@@ -24,9 +24,10 @@ def map_search_post():
             print(coordinate_point)
             coordinates.append({'lat': coordinate_point['stop']['lat'], 'lon': coordinate_point['stop']['lon'], 'bus_line':coordinate_point['bus_line']})
 
-        return render_template('map.html', data=json.dumps(coordinates), trip_time=0, stops=get_all_stops())
+        return render_template('map.html', data=json.dumps(coordinates), stops=get_all_stops(), origin_selected = origin, target_selected = target)
 
-    return render_template('map.html', data=json.dumps([]), airports=get_all_stops())
+    return render_template('map.html', data=json.dumps([]), stops=get_all_stops(),
+                           origin_selected = origin, target_selected = target)
 
 
 def get_all_stops():
