@@ -21,7 +21,10 @@ def map_search_post():
     if bus_path:
         coordinates = list()
         for coordinate_point in bus_path:
-            coordinates.append({'lat': coordinate_point['stop']['lat'], 'lon': coordinate_point['stop']['lon'], 'bus_line':coordinate_point['bus_line']})
+            coordinates.append({'lat': coordinate_point['stop']['lat'],
+                                'lon': coordinate_point['stop']['lon'],
+                                'bus_line': coordinate_point['bus_line'],
+                                'name': coordinate_point['stop']['name']})
 
         return render_template('map.html', data=json.dumps(coordinates), stops=get_all_stops(), origin_selected = origin, target_selected = target)
 
